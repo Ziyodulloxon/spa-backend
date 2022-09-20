@@ -17,6 +17,7 @@ use yii\web\IdentityInterface;
  * @property string $password_reset_token
  * @property string $verification_token
  * @property string $email
+ * @property string $phone
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
@@ -41,21 +42,44 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            ['phone', 'string'],
+            [
+                'status',
+                'in',
+                'range' => [
+                    self::STATUS_ACTIVE,
+                    self::STATUS_INACTIVE,
+                    self::STATUS_DELETED
+                ]
+            ],
+        ];
+    }
+
+    public function fields(): array
+    {
+        return [
+            "id",
+            "username",
+            "phone",
+            "email",
+            "status",
+            "created_at" => function (self $user) {
+                return date("Y-m-d H:i", $this->created_at);
+            },
         ];
     }
 
